@@ -92,9 +92,10 @@ function prepare_python_and_pip() {
 	if linux-version compare "${pip3_version_number}" ge "23.0"; then
 		pip3_extra_args+=("--break-system-packages")
 	fi
-	if linux-version compare "${pip3_version_number}" ge "22.1"; then
-		pip3_extra_args+=("--root-user-action=ignore")
-	fi
+	
+#	if linux-version compare "${pip3_version_number}" ge "22.1"; then
+#		pip3_extra_args+=("--root-user-action=ignore")
+#	fi
 
 	declare python_hash_base="${python_pip_cache}/pip_pkg_hash"
 	declare python_hash_file="${python_hash_base}_${python3_pip_dependencies_hash}"
