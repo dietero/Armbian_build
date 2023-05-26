@@ -475,32 +475,32 @@ function install_distribution_agnostic() {
 	#
 	# example: SERIALCON="ttyS0:15000000,ttyGS1"
 	#
-	ifs=$IFS
-	for i in $(echo "${SERIALCON:-'ttyS0'}" | sed "s/,/ /g"); do
-		IFS=':' read -r -a array <<< "$i"
-		[[ "${array[0]}" == "tty1" ]] && continue # Don't enable tty1 as serial console.
-		display_alert "Enabling serial console" "${array[0]}" "info"
-		# add serial console to secure tty list
-		[ -z "$(grep -w '^${array[0]}' "${SDCARD}"/etc/securetty 2> /dev/null)" ] &&
-			echo "${array[0]}" >> "${SDCARD}"/etc/securetty
-		if [[ ${array[1]} != "115200" && -n ${array[1]} ]]; then
-			# make a copy, fix speed and enable
-			cp "${SDCARD}"/lib/systemd/system/serial-getty@.service \
-				"${SDCARD}/lib/systemd/system/serial-getty@${array[0]}.service"
-			sed -i "s/--keep-baud 115200/--keep-baud ${array[1]},115200/" \
-				"${SDCARD}/lib/systemd/system/serial-getty@${array[0]}.service"
-		fi
-		chroot_sdcard systemctl daemon-reload
-		chroot_sdcard systemctl --no-reload enable "serial-getty@${array[0]}.service"
-		if [[ "${array[0]}" == "ttyGS0" && $LINUXFAMILY == sun8i && $BRANCH == default ]]; then
-			mkdir -p "${SDCARD}"/etc/systemd/system/serial-getty@ttyGS0.service.d
-			cat <<- EOF > "${SDCARD}"/etc/systemd/system/serial-getty@ttyGS0.service.d/10-switch-role.conf
-				[Service]
-				ExecStartPre=-/bin/sh -c "echo 2 > /sys/bus/platform/devices/sunxi_usb_udc/otg_role"
-			EOF
-		fi
-	done
-	IFS=$ifs
+#	ifs=$IFS
+#	for i in $(echo "${SERIALCON:-'ttyS0'}" | sed "s/,/ /g"); do
+#		IFS=':' read -r -a array <<< "$i"
+#		[[ "${array[0]}" == "tty1" ]] && continue # Don't enable tty1 as serial console.
+#		display_alert "Enabling serial console" "${array[0]}" "info"
+#		# add serial console to secure tty list
+#		[ -z "$(grep -w '^${array[0]}' "${SDCARD}"/etc/securetty 2> /dev/null)" ] &&
+#			echo "${array[0]}" >> "${SDCARD}"/etc/securetty
+#		if [[ ${array[1]} != "115200" && -n ${array[1]} ]]; then
+#			# make a copy, fix speed and enable
+#			cp "${SDCARD}"/lib/systemd/system/serial-getty@.service \
+#				"${SDCARD}/lib/systemd/system/serial-getty@${array[0]}.service"
+#			sed -i "s/--keep-baud 115200/--keep-baud ${array[1]},115200/" \
+#				"${SDCARD}/lib/systemd/system/serial-getty@${array[0]}.service"
+#		fi
+#		chroot_sdcard systemctl daemon-reload
+#		chroot_sdcard systemctl --no-reload enable "serial-getty@${array[0]}.service"
+#		if [[ "${array[0]}" == "ttyGS0" && $LINUXFAMILY == sun8i && $BRANCH == default ]]; then
+#			mkdir -p "${SDCARD}"/etc/systemd/system/serial-getty@ttyGS0.service.d
+#			cat <<- EOF > "${SDCARD}"/etc/systemd/system/serial-getty@ttyGS0.service.d/10-switch-role.conf
+#				[Service]
+#				ExecStartPre=-/bin/sh -c "echo 2 > /sys/bus/platform/devices/sunxi_usb_udc/otg_role"
+#			EOF
+#		fi
+#	done
+#	IFS=$ifs
 
 	[[ $LINUXFAMILY == sun*i ]] && mkdir -p "${SDCARD}"/boot/overlay-user
 
